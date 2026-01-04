@@ -1,0 +1,52 @@
+// Difiicult Meidum
+
+// problem 
+
+//  Given an integer array nums, return the sum of divisors of the integers in that array that have exactly four divisors. If there is no such integer in the array, return 0.
+
+
+//   solution
+
+
+//  A number has exactly 4 divisors if and only if it is one of these two forms:
+
+//  Case 1: p^3
+//  Case 2: p×q (Where p and q are two distinct primes)
+
+
+//  code
+
+class Solution {
+
+    public static boolean isPrime(int num){
+        for(int i=2;i*i<=num;i++){
+            if(num%i==0)return false;
+        }
+        return true;
+    }
+    public int sumFourDivisors(int[] nums) {
+        int sum=0;
+        for(int i=0;i<nums.length;i++){
+            if(!isPrime(nums[i])){
+                int p =(int)Math.cbrt(nums[i]);
+                if(isPrime(p)&&p*p*p==nums[i]){
+
+                            sum+=p+p*p+p*p*p+1;
+                }
+                for(int j=2;j<=nums[i]/2;j++){
+                    if(nums[i]%j==0){
+                        // System.out.println(j+" "+nums[i]);
+                        int num2=nums[i]/j;
+                        // System.out.println(num2+" "+nums[i]);
+                        if(j!=num2&&isPrime(j)&&isPrime(num2)){
+                            sum+=j+num2+1+nums[i];
+                        }
+                        break;
+                    }
+                }
+
+            }
+        }
+        return sum;
+    }
+}
