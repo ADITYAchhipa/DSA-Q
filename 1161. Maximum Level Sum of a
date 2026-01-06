@@ -1,0 +1,76 @@
+//    difficulty : Medium
+
+//    Problem
+//    Given the root of a binary tree, the level of its root is 1, the level of its children is 2, and so on.
+
+//    Return the smallest level x such that the sum of all the values of nodes at level x is maximal.
+
+
+//    Approch
+
+//    I use a queue to perform level-order traversal (BFS).
+
+//    I start from level 1 (the root level).
+
+//    For each level:
+
+//    I calculate how many nodes are in this level.
+//    I add all their values to get the level sum.
+//    I push their children into the queue for the next level.
+//    I compare the current level sum with the maximum sum seen so far.
+
+//    If the current sum is bigger:
+
+//    I update the maximum sum.
+//    I store the current level number.
+//    After processing all levels, I return the stored level number.
+
+
+
+
+//    code
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int maxLevelSum(TreeNode root) {
+        if(root==null) return 0;
+        Queue<TreeNode> arr = new LinkedList<>();
+        arr.offer(root);
+        int max=Integer.MIN_VALUE;
+        int level =1;
+        int store =1;
+        while(!arr.isEmpty()){
+        Queue<TreeNode> temp = new LinkedList<>();
+            int sum=0;
+            while(!arr.isEmpty()){
+                TreeNode x = arr.poll();
+                if(x.left!=null)temp.offer(x.left);
+                if(x.right!=null)temp.offer(x.right);
+                sum+=x.val;
+            }
+            arr=temp;
+            if(sum>max){
+                max=sum;
+                store=level;
+            }
+            level++;
+        } 
+        return store;
+    }
+}
+
+
