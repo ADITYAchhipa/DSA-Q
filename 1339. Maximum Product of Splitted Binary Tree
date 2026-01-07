@@ -1,0 +1,83 @@
+//    Difficulty : Medium
+
+
+
+//    Problem 
+
+//    Given the root of a binary tree, split the binary tree into two subtrees by removing one edge such that the product of the sums of the subtrees is maximized.
+//    Return the maximum product of the sums of the two subtrees. Since the answer may be too large, return it modulo 109 + 7.
+//    Note that you need to maximize the answer before taking the mod and not after taking it.
+
+
+
+//    Approch
+
+
+//    🧠 Approach (Short & Sweet)
+
+//    Compute total sum of the binary tree using a DFS (helper).
+//    Try every possible split by considering each node as a cut point:
+//    For each subtree, calculate its sum.
+//    The other subtree sum = totalSum - subtreeSum.
+//    Maximize the product by minimizing the absolute difference between the two subtree sums (closest to equal split).
+//    Calculate final product using the best split found, and take modulo 
+//    the end (as required).
+
+//    ⏱ Time Complexity: O(N)
+//    📦 Space Complexity: O(H) (recursion stack, where H = height of tree)
+
+//    Clean two-pass DFS:
+//    First pass → total sum
+//    Second pass → best split 👍
+
+
+
+// code
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    static long diff=0;
+    public int maxProduct(TreeNode root) {
+        if(root==null) return 0;
+        long total=helper(root);
+        diff=total;
+        long x=dfs(total,root);
+        long mod=(long)Math.pow(10,9)+7;
+        // System.out.println(diff);
+        return (int)((((total-diff)/2)%mod*(((total-diff)/2)%mod+diff)%mod)%mod);
+    }
+    public static long helper(TreeNode root){
+        if(root==null) return 0;
+        long l=0;
+        long r=0;
+        if(root.left!=null)l=helper(root.left); 
+        if(root.right!=null)r=helper(root.right);
+        return root.val+l+r; 
+         
+    }
+    public static long dfs(long total,TreeNode root){
+        if(root==null) return 0;
+        long l=0;
+        long r=0;
+        if(root.left!=null)l=dfs(total,root.left); 
+        if(root.right!=null)r=dfs(total,root.right);
+        long sum=root.val+l+r;
+        if(Math.abs(((total-sum)-sum))<diff)diff=Math.abs(((total-sum)-sum));
+        return sum; 
+    }
+}
+
