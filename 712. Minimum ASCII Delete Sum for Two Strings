@@ -1,0 +1,50 @@
+//    Difficulty : Medium
+
+
+//    Problem
+
+//    Given two strings s1 and s2, return the lowest ASCII sum of deleted characters to make two strings equal.
+
+
+
+//    ✅ Approach (DP + 1D Optimization)
+
+//    First calculate sum = total ASCII value of all characters in s1 and s2.
+//    Goal: min delete sum → same as maximize ASCII sum of common characters kept.
+//    We use DP where arr[j] stores the minimum delete sum for prefixes:
+//    considering s1[0..i] and s2[0..j]
+//    While traversing:
+//    If s1[i] == s2[j], we can keep this character in both strings
+//    → delete cost reduces by 2 * ASCII(char) from previous diagonal state (prev)
+//    Also take minimum by skipping characters (arr[j] / arr[j+1])
+//    prev is used to store diagonal value (dp[i-1][j-1]) to simulate 2D DP using only 1 array.
+
+//    ✅ Answer is in arr[s2.length()].
+
+
+//    Code
+
+class Solution {
+    public int minimumDeleteSum(String s1, String s2) {
+        int sum=0;
+        
+        for(int i=0;i<s1.length();i++)     sum+=(int)(s1.charAt(i));
+        for(int i=0;i<s2.length();i++)     sum+=(int)(s2.charAt(i));
+
+        int arr[]=new int[s2.length()+1];
+        Arrays.fill(arr,sum);
+    
+        for(int i=0;i<s1.length();i++){
+        int prev=sum;
+            for(int j=0;j<s2.length();j++){
+                int temp=arr[j+1];
+            
+                if(s1.charAt(i)==s2.charAt(j))     arr[j+1]=Math.min(prev-(s1.charAt(i))*2,arr[j+1]);
+                
+                arr[j+1]=Math.min(arr[j+1],arr[j]);
+                prev=temp;
+            }
+        }
+       return arr[s2.length()];
+    }
+}
