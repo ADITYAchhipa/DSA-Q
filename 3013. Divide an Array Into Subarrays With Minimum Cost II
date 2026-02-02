@@ -1,0 +1,114 @@
+class Solution {
+    public long minimumCost(int[] nums, int k, int dist) {
+        long n1 = nums[0];
+        k--; // same as your original
+        int n = nums.length;
+        // minHeap for available candidates (value ascending, tie by index)
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> {
+            if (a[0] != b[0]) return a[0] - b[0];
+            return a[1] - b[1];
+        });
+        // maxHeap for current selected k smallest (value descending, tie by index)
+        PriorityQueue<int[]> maxHeap = new PriorityQueue<>((a, b) -> {
+            if (a[0] != b[0]) return b[0] - a[0];
+            return b[1] - a[1];
+        });
+
+        // mark which indices are currently selected (O(1) membership)
+        boolean[] inSelected = new boolean[n];
+
+        // initial window: indices 1 .. dist+1 (guard upper bound)
+        for (int i = 1; i <= dist + 1 && i < n; i++) {
+            minHeap.offer(new int[]{nums[i], i});
+        }
+
+        long sum = 0L;
+        int selectedCount = 0;
+        // pick initial k smallest from the initial window
+        for (int t = 0; t < k; t++) {
+            // clean minHeap of already-selected or invalid entries (none invalid right now)
+            while (!minHeap.isEmpty() && inSelected[minHeap.peek()[1]]) minHeap.poll();
+            if (minHeap.isEmpty()) break; // defensive
+            int[] picked = minHeap.poll();
+            inSelected[picked[1]] = true;
+            maxHeap.offer(picked);
+            sum += picked[0];
+            selectedCount++;
+        }
+
+        long best = sum;
+        int prev = 1; // left boundary that will expire next
+
+        // helper lambdas would be nice but keep loops inline for Java 8 compat
+        for (int i = dist + 2; i < n; i++) {
+            // add the new right endpoint into available candidates
+            minHeap.offer(new int[]{nums[i], i});
+
+            // handle expiration of index 'prev'
+            if (inSelected[prev]) {
+                // it was selected, now it leaves the window
+                inSelected[prev] = false;
+                sum -= nums[prev];
+                selectedCount--;
+                // the old element remains in maxHeap but will be lazily skipped when popped/peeked
+            }
+            // If prev wasn't selected, nothing to remove from sum
+
+            // Fill up selected to have exactly k items again (if possible)
+            while (selectedCount < k) {
+                // clean minHeap top of invalid/already-selected entries
+                while (!minHeap.isEmpty()) {
+                    int[] top = minHeap.peek();
+                    if (top[1] <= prev || inSelected[top[1]]) {
+                        minHeap.poll();
+                    } else break;
+                }
+                if (minHeap.isEmpty()) break;
+                int[] cand = minHeap.poll();
+                inSelected[cand[1]] = true;
+                maxHeap.offer(cand);
+                sum += cand[0];
+                selectedCount++;
+            }
+
+            // Now try to improve by swapping: if smallest available < largest selected
+            while (true) {
+                // clean mins
+                while (!minHeap.isEmpty()) {
+                    int[] ttop = minHeap.peek();
+                    if (ttop[1] <= prev || inSelected[ttop[1]]) minHeap.poll();
+                    else break;
+                }
+                // clean max
+                while (!maxHeap.isEmpty()) {
+                    int[] ttop = maxHeap.peek();
+                    if (ttop[1] <= prev || !inSelected[ttop[1]]) maxHeap.poll();
+                    else break;
+                }
+                if (minHeap.isEmpty() || maxHeap.isEmpty()) break;
+                int[] smallestAvail = minHeap.peek();
+                int[] largestSelected = maxHeap.peek();
+                if (smallestAvail[0] < largestSelected[0]) {
+                    // perform swap
+                    minHeap.poll();
+                    maxHeap.poll();
+                    // update inSelected flags
+                    inSelected[largestSelected[1]] = false;
+                    inSelected[smallestAvail[1]] = true;
+                    // push into heaps
+                    minHeap.offer(largestSelected); // now available candidate
+                    maxHeap.offer(smallestAvail);
+                    // adjust sum
+                    sum += (smallestAvail[0] - largestSelected[0]);
+                } else break;
+            }
+
+            // maintain best
+            if (sum < best) best = sum;
+
+            prev++; // window slides right by one
+        }
+
+        return best + n1;
+    }
+}
