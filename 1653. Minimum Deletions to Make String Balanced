@@ -1,0 +1,20 @@
+class Solution {
+    public int minimumDeletions(String s) {
+        int ca=0;
+        int cb=0;
+        int tb=0;
+        int n=s.length();
+        for(int i=0;i<n;i++){
+            if(s.charAt(i)=='b')tb++;
+            
+        }
+        int max=0;
+        for(int i=0;i<n;i++){
+            if(s.charAt(i)=='a')ca++;
+            max=Math.max(max,ca+(tb-cb));
+            if(s.charAt(i)=='b')cb++;
+        }
+        return n-max;
+
+    }
+}
