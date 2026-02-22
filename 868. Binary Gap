@@ -1,0 +1,24 @@
+class Solution {
+    public int binaryGap(int n) {
+        boolean flag=true;
+        int distance=0;
+        int count=1;
+        while(n>0){
+            if((n&1)==1){
+                if(flag){
+                    flag=false;
+                    count=1;
+                }
+                else{
+                    distance=Math.max(distance,count);
+                    count=1;
+                }
+            }
+            else{
+                count++;
+            }
+            n=n>>1;
+        }
+        return distance;
+    }
+}
