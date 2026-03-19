@@ -1,0 +1,20 @@
+class Solution {
+    public int numberOfSubmatrices(char[][] grid) {
+        int countx=0;
+        int county=0;
+        int arrx[][]=new int[grid.length+1][grid[0].length+1];
+        int arry[][]=new int[grid.length+1][grid[0].length+1];
+        
+        for(int i=1;i<=grid.length;i++){
+            for(int j=1;j<=grid[0].length;j++){
+                
+                
+                arrx[i][j]=arrx[i-1][j]+arrx[i][j-1]+(grid[i-1][j-1]=='X'?1:0)-arrx[i-1][j-1];
+                arry[i][j]=arry[i-1][j]+arry[i][j-1]+(grid[i-1][j-1]=='Y'?1:0)-arry[i-1][j-1];
+                if(arrx[i][j]==arry[i][j]&&arrx[i][j]!=0)countx++;
+            }
+        }
+        
+        return countx;
+    }
+}
